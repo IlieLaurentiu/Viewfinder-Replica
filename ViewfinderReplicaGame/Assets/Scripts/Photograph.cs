@@ -7,9 +7,11 @@ public class Photograph : MonoBehaviour
     [Header("The Photograph GameObject")]
     [SerializeField] private GameObject photograph;
 
+    [Header("State Transition Animations")]
+    [SerializeField] private float animDuration = 0.5f;
+
     private Quaternion handheldRotation, focusedRotation;
     private Vector3 handheldPosition, focusedPosition, handheldScale, focusedScale;
-    private Vector3 velocity = Vector3.one;
     private PhotoState photoState;
 
     bool isFocused, isAnimating;
@@ -53,7 +55,11 @@ public class Photograph : MonoBehaviour
             }
 
             SwitchPhotographState();
+
+            StartCoroutine(Animate(animDuration));
         }
+
+
     }
 
     void SwitchPhotographState()
@@ -65,16 +71,10 @@ public class Photograph : MonoBehaviour
 
             case PhotoState.HANDHELD:
                 isFocused = false;
-                photograph.transform.localRotation = handheldRotation;
-                StartCoroutine(AnimatePosition(handheldPosition, 0.2f));
-                photograph.transform.localScale = handheldScale;
                 break;
 
             case PhotoState.FOCUSED:
                 isFocused = true;
-                photograph.transform.localRotation = focusedRotation;
-                StartCoroutine(AnimatePosition(focusedPosition, 0.2f));
-                photograph.transform.localScale = focusedScale;
                 break;
         }
     }
@@ -86,27 +86,51 @@ public class Photograph : MonoBehaviour
         FOCUSED
     }
 
-    private IEnumerator AnimatePosition(Vector3 endValue, float duration)
+    private IEnumerator Animate(float duration)
     {
         isAnimating = true;
         float timeElapsed = 0;
 
-        // add 0.7 seconds to duration to fix severe undershoot of smoothdamp
-        // rewrite this later
-        while (timeElapsed < duration + 0.7f)
+        while (timeElapsed < duration)
         {
-            photograph.transform.localPosition = Vector3.SmoothDamp(photograph.transform.localPosition, endValue, ref velocity, duration);
+            if(!isFocused)
+            {
+                photograph.transform.localPosition = new Vector3(
+                    x: Mathf.Lerp(photograph.transform.localPosition.x, handheldPosition.x, duration),
+                    y: Mathf.Lerp(photograph.transform.localPosition.y, handheldPosition.y, duration),
+                    z: Mathf.Lerp(photograph.transform.localPosition.z, handheldPosition.z, duration)
+                    );
+
+                photograph.transform.localScale = new Vector3(
+                    x: Mathf.Lerp(photograph.transform.localScale.x, handheldScale.x, duration),
+                    y: Mathf.Lerp(photograph.transform.localScale.y, handheldScale.y, duration),
+                    z: Mathf.Lerp(photograph.transform.localScale.z, handheldScale.z, duration)
+                    );
+
+                photograph.transform.localRotation = Quaternion.Slerp(photograph.transform.localRotation, handheldRotation, duration);               
+            } 
+            else
+            {
+                photograph.transform.localPosition = new Vector3(
+                    x: Mathf.Lerp(photograph.transform.localPosition.x, focusedPosition.x, duration),
+                    y: Mathf.Lerp(photograph.transform.localPosition.y, focusedPosition.y, duration),
+                    z: Mathf.Lerp(photograph.transform.localPosition.z, focusedPosition.z, duration)
+                    );
+
+                photograph.transform.localScale = new Vector3(
+                    x: Mathf.Lerp(photograph.transform.localScale.x, focusedScale.x, duration),
+                    y: Mathf.Lerp(photograph.transform.localScale.y, focusedScale.y, duration),
+                    z: Mathf.Lerp(photograph.transform.localScale.z, focusedScale.z, duration)
+                    );
+
+                photograph.transform.localRotation = Quaternion.Slerp(photograph.transform.localRotation, focusedRotation, duration);
+            }
+
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-
-        // fix undershoot of the smoothdamp function
-        if(photograph.transform.localPosition != endValue)
-        {
-            photograph.transform.localPosition = endValue;
-        }
-
-        yield return new WaitForSeconds(duration);
+        
+        yield return new WaitForSeconds(timeElapsed);
         isAnimating = false;
     }
 }
