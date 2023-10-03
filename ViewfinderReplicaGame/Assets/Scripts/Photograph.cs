@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -8,10 +9,10 @@ public class Photograph : MonoBehaviour
 
     private Quaternion handheldRotation, focusedRotation;
     private Vector3 handheldPosition, focusedPosition, handheldScale, focusedScale;
-
+    private Vector3 velocity = Vector3.one;
     private PhotoState photoState;
 
-    bool isFocused;
+    bool isFocused, isAnimating;
 
     private void Awake()
     {
@@ -39,6 +40,9 @@ public class Photograph : MonoBehaviour
         // On right click switch photograph state
         if(Input.GetKeyDown(KeyCode.Mouse1)) 
         {
+            if (isAnimating)
+                return;
+
             if (isFocused) 
             {
                 photoState = PhotoState.HANDHELD;
@@ -62,14 +66,14 @@ public class Photograph : MonoBehaviour
             case PhotoState.HANDHELD:
                 isFocused = false;
                 photograph.transform.localRotation = handheldRotation;
-                photograph.transform.localPosition = handheldPosition;
+                StartCoroutine(AnimatePosition(handheldPosition, 0.2f));
                 photograph.transform.localScale = handheldScale;
                 break;
 
             case PhotoState.FOCUSED:
                 isFocused = true;
                 photograph.transform.localRotation = focusedRotation;
-                photograph.transform.localPosition = focusedPosition;
+                StartCoroutine(AnimatePosition(focusedPosition, 0.2f));
                 photograph.transform.localScale = focusedScale;
                 break;
         }
@@ -80,5 +84,29 @@ public class Photograph : MonoBehaviour
         NONE,
         HANDHELD,
         FOCUSED
+    }
+
+    private IEnumerator AnimatePosition(Vector3 endValue, float duration)
+    {
+        isAnimating = true;
+        float timeElapsed = 0;
+
+        // add 0.7 seconds to duration to fix severe undershoot of smoothdamp
+        // rewrite this later
+        while (timeElapsed < duration + 0.7f)
+        {
+            photograph.transform.localPosition = Vector3.SmoothDamp(photograph.transform.localPosition, endValue, ref velocity, duration);
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // fix undershoot of the smoothdamp function
+        if(photograph.transform.localPosition != endValue)
+        {
+            photograph.transform.localPosition = endValue;
+        }
+
+        yield return new WaitForSeconds(duration);
+        isAnimating = false;
     }
 }
