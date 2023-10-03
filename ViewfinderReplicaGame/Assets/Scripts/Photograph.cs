@@ -58,8 +58,6 @@ public class Photograph : MonoBehaviour
 
             StartCoroutine(Animate(animDuration));
         }
-
-
     }
 
     void SwitchPhotographState()
@@ -88,7 +86,6 @@ public class Photograph : MonoBehaviour
 
     private IEnumerator Animate(float duration)
     {
-        isAnimating = true;
         float timeElapsed = 0;
 
         while (timeElapsed < duration)
@@ -130,7 +127,5 @@ public class Photograph : MonoBehaviour
             yield return null;
         }
         
-        yield return new WaitForSeconds(timeElapsed);
-        isAnimating = false;
     }
 }
