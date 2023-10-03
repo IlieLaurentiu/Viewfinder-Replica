@@ -96,34 +96,34 @@ public class Photograph : MonoBehaviour
             if(!isFocused)
             {
                 photograph.transform.localPosition = new Vector3(
-                    x: Mathf.Lerp(photograph.transform.localPosition.x, handheldPosition.x, duration),
-                    y: Mathf.Lerp(photograph.transform.localPosition.y, handheldPosition.y, duration),
-                    z: Mathf.Lerp(photograph.transform.localPosition.z, handheldPosition.z, duration)
+                    x: Mathf.Lerp(photograph.transform.localPosition.x, handheldPosition.x, timeElapsed / duration),
+                    y: Mathf.Lerp(photograph.transform.localPosition.y, handheldPosition.y, timeElapsed / duration),
+                    z: Mathf.Lerp(photograph.transform.localPosition.z, handheldPosition.z, timeElapsed / duration)
                     );
 
                 photograph.transform.localScale = new Vector3(
-                    x: Mathf.Lerp(photograph.transform.localScale.x, handheldScale.x, duration),
-                    y: Mathf.Lerp(photograph.transform.localScale.y, handheldScale.y, duration),
-                    z: Mathf.Lerp(photograph.transform.localScale.z, handheldScale.z, duration)
+                    x: Mathf.Lerp(photograph.transform.localScale.x, handheldScale.x, timeElapsed / duration),
+                    y: Mathf.Lerp(photograph.transform.localScale.y, handheldScale.y, timeElapsed / duration),
+                    z: Mathf.Lerp(photograph.transform.localScale.z, handheldScale.z, timeElapsed / duration)
                     );
 
-                photograph.transform.localRotation = Quaternion.Slerp(photograph.transform.localRotation, handheldRotation, duration);               
+                photograph.transform.localRotation = Quaternion.Slerp(photograph.transform.localRotation, handheldRotation, timeElapsed / duration);               
             } 
             else
             {
                 photograph.transform.localPosition = new Vector3(
-                    x: Mathf.Lerp(photograph.transform.localPosition.x, focusedPosition.x, duration),
-                    y: Mathf.Lerp(photograph.transform.localPosition.y, focusedPosition.y, duration),
-                    z: Mathf.Lerp(photograph.transform.localPosition.z, focusedPosition.z, duration)
+                    x: Mathf.Lerp(photograph.transform.localPosition.x, focusedPosition.x, timeElapsed / duration),
+                    y: Mathf.Lerp(photograph.transform.localPosition.y, focusedPosition.y, timeElapsed / duration),
+                    z: Mathf.Lerp(photograph.transform.localPosition.z, focusedPosition.z, timeElapsed / duration)
                     );
 
                 photograph.transform.localScale = new Vector3(
-                    x: Mathf.Lerp(photograph.transform.localScale.x, focusedScale.x, duration),
-                    y: Mathf.Lerp(photograph.transform.localScale.y, focusedScale.y, duration),
-                    z: Mathf.Lerp(photograph.transform.localScale.z, focusedScale.z, duration)
+                    x: Mathf.Lerp(photograph.transform.localScale.x, focusedScale.x, timeElapsed / duration),
+                    y: Mathf.Lerp(photograph.transform.localScale.y, focusedScale.y, timeElapsed / duration),
+                    z: Mathf.Lerp(photograph.transform.localScale.z, focusedScale.z, timeElapsed / duration)
                     );
 
-                photograph.transform.localRotation = Quaternion.Slerp(photograph.transform.localRotation, focusedRotation, duration);
+                photograph.transform.localRotation = Quaternion.Slerp(photograph.transform.localRotation, focusedRotation, timeElapsed / duration);
             }
 
             timeElapsed += Time.deltaTime;
